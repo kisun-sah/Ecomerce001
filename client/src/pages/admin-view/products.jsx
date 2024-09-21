@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /* eslint-disable react/jsx-key */
 import ProductImageUpload from "@/components/admin-view/image-upload";
 import AdminProductTile from "@/components/admin-view/product-tile";
@@ -35,118 +34,86 @@ const initialFormData = {
 };
 
 function AdminProducts() {
-  const [openCreateProductsDialog, setOpenCreateProductsDialog] = useState(false);
+  const [openCreateProductsDialog, setOpenCreateProductsDialog] =
+    useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
-  
-  // Local product list state to immediately reflect changes
-  const [localProductList, setLocalProductList] = useState([]);
 
-  const { productList = [] } = useSelector((state) => state.AdminProducts || {});
+  const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Fetch all products initially and set to local state
-    dispatch(fetchAllProducts()).then((fetchData) => {
-      setLocalProductList(fetchData.payload);  // Updating local state
-      console.log('Initial Fetch of Products:', fetchData);
-    });
-  }, [dispatch]);
-
   function onSubmit(event) {
     event.preventDefault();
-  
-    const action = currentEditedId !== null
-      ? editProduct({ id: currentEditedId, formData })
-      : addNewProduct({ ...formData, image: uploadedImageUrl });
-  
-    dispatch(action).then((data) => {
-      if (data?.payload?.success) {
-        // Ensure localProductList is an array
-        const safeLocalProductList = Array.isArray(localProductList) ? localProductList : [];
-  
-        // Log the current state for debugging
-        console.log('Local Product List before update:', safeLocalProductList);
-  
-        // Optimistic UI Update
-        const updatedProduct = currentEditedId !== null
-          ? safeLocalProductList.map(product => 
-              product.id === currentEditedId ? data.payload.product : product
-            )
-          : [...safeLocalProductList, data.payload.product];  // Add new product to local list
-  
-        setLocalProductList(updatedProduct);
-  
-        // Close the dialog and reset the form
-        setOpenCreateProductsDialog(false);
-        setFormData(initialFormData);
-        setImageFile(null);
-  
-        toast({
-          title: currentEditedId !== null ? "Product updated successfully" : "Product added successfully",
+
+    currentEditedId !== null
+      ? dispatch(
+          editProduct({
+            id: currentEditedId,
+            formData,
+          })
+        ).then((data) => {
+          if (data?.payload?.success) {
+            dispatch(fetchAllProducts());
+            setFormData(initialFormData);
+            setOpenCreateProductsDialog(false);
+            setCurrentEditedId(null);
+          }
+        })
+      : dispatch(
+          addNewProduct({
+            ...formData,
+            image: uploadedImageUrl,
+          })
+        ).then((data) => {
+          if (data?.payload?.success) {
+            dispatch(fetchAllProducts());
+            setOpenCreateProductsDialog(false);
+            setImageFile(null);
+            setFormData(initialFormData);
+            toast({
+              title: "Product add successfully",
+            });
+          }
         });
-        setCurrentEditedId(null);
-  
-        // Fetch all products to update Redux store and reflect changes globally
-        dispatch(fetchAllProducts()).then((fetchData) => {
-          // Assuming fetchData.payload is always an array
-          setLocalProductList(fetchData.payload);  // Updating local state again after fetching
-          console.log('Fetched Products After Add/Edit:', fetchData);
-        });
-      } else {
-        toast({
-          title: "Operation failed",
-          description: data?.payload?.message || "Something went wrong.",
-          variant: "destructive",
-        });
-      }
-    });
   }
-  
 
   function handleDelete(getCurrentProductId) {
     dispatch(deleteProduct(getCurrentProductId)).then((data) => {
       if (data?.payload?.success) {
-        // Update local state immediately
-        setLocalProductList(localProductList.filter(product => product.id !== getCurrentProductId));
-
-        // Re-fetch products to ensure everything is synced
-        dispatch(fetchAllProducts()).then((fetchData) => {
-          setLocalProductList(fetchData.payload);  // Updating local state after fetch
-          console.log('Fetched Products After Delete:', fetchData);
-        });
-      } else {
-        toast({
-          title: "Deletion failed",
-          description: data?.payload?.message || "Something went wrong.",
-          variant: "destructive",
-        });
+        dispatch(fetchAllProducts());
       }
     });
   }
 
   function isFormValid() {
     return Object.keys(formData)
-      .filter((key) => key !== "averageReview")
-      .every((key) => formData[key] !== "");
+      .filter((currentKey) => currentKey !== "averageReview")
+      .map((key) => formData[key] !== "")
+      .every((item) => item);
   }
+
+  useEffect(() => {
+    dispatch(fetchAllProducts());
+  }, [dispatch]);
 
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
-        <Button onClick={() => setOpenCreateProductsDialog(true)} className="text-white bg-black">
+        <Button
+          onClick={() => setOpenCreateProductsDialog(true)}
+          className="bg-black text-white"
+        >
           Add New Product
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {localProductList && localProductList.length > 0
-          ? localProductList.map((productItem) => (
+        {productList && productList.length > 0
+          ? productList.map((productItem) => (
               <AdminProductTile
-                key={productItem.id}
                 setFormData={setFormData}
                 setOpenCreateProductsDialog={setOpenCreateProductsDialog}
                 setCurrentEditedId={setCurrentEditedId}
@@ -154,7 +121,7 @@ function AdminProducts() {
                 handleDelete={handleDelete}
               />
             ))
-          : <div>No products available</div>}
+          : null}
       </div>
       <Sheet
         open={openCreateProductsDialog}
@@ -164,13 +131,12 @@ function AdminProducts() {
           setFormData(initialFormData);
         }}
       >
-        <SheetContent side="right" className="overflow-auto p-6 bg-white shadow-lg rounded-lg transition-all duration-300 ease-in-out">
+            <SheetContent side="right" className="overflow-auto p-6 bg-white shadow-lg rounded-lg transition-all duration-300 ease-in-out">
           <SheetHeader>
-            <SheetTitle className="text-2xl font-semibold text-gray-700 mb-4">
+            <SheetTitle>
               {currentEditedId !== null ? "Edit Product" : "Add New Product"}
             </SheetTitle>
           </SheetHeader>
-
           <ProductImageUpload
             imageFile={imageFile}
             setImageFile={setImageFile}
@@ -180,7 +146,6 @@ function AdminProducts() {
             imageLoadingState={imageLoadingState}
             isEditMode={currentEditedId !== null}
           />
-
           <div className="py-6">
             <CommonForm
               onSubmit={onSubmit}
@@ -189,7 +154,7 @@ function AdminProducts() {
               buttonText={currentEditedId !== null ? "Edit" : "Add"}
               formControls={addProductFormElements}
               isBtnDisabled={!isFormValid()}
-              className="space-y-6"
+              className="bg-black text-white" // For add/edit button styling
             />
           </div>
         </SheetContent>

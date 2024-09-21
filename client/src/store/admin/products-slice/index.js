@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+
 const initialState = {
   isLoading: false,
   productList: [],
@@ -72,11 +73,14 @@ const AdminProductsSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        console.log(action.payload);
+        
         state.isLoading = false;
         state.productList = action.payload.data;
       })
-      // eslint-disable-next-line no-unused-vars
+   
       .addCase(fetchAllProducts.rejected, (state, action) => {
+        console.log(action.payload);
         state.isLoading = false;
         state.productList = [];
       });

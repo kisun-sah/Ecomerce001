@@ -29,15 +29,16 @@ function AdminProductTile({
                 salePrice > 0 ? "line-through" : ""
               } text-lg font-semibold text-primary`}
             >
-              ${price || "N/A"}  {/* Fallback price */}
+              ₹{price || "N/A"}  {/* Fallback price */}
             </span>
             {salePrice > 0 && (
-              <span className="text-lg font-bold">${salePrice}</span>
+              <span className="text-lg font-bold">₹{salePrice}</span>
             )}
           </div>
         </CardContent>
         <CardFooter className="flex justify-between items-center">
           <Button
+              className="text-white bg-black"
             onClick={() => {
               setOpenCreateProductsDialog(true);
               setCurrentEditedId(_id);
@@ -48,6 +49,7 @@ function AdminProductTile({
             Edit
           </Button>
           <Button
+          className="text-white bg-black"
             onClick={() => handleDelete(_id)}
             disabled={!_id}  // Disable if no product ID
             variant="destructive"  // Apply red styling for Delete

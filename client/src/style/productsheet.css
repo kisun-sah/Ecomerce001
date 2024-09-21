@@ -1,0 +1,51 @@
+
+  
+
+  
+/* Styles for Select (Dropdown) Inputs */
+select {
+    border: 1px solid #000;  /* Black border */
+    background-color: #fff;  /* White background */
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #000;  /* Black text */
+    font-size: 16px;  /* Increase font size for readability */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    appearance: none;  /* Removes default arrow for custom styling */
+    cursor: pointer;   /* Pointer cursor for better UX */
+  }
+  
+  /* Dropdown List */
+  select option {
+    background-color: #fff;  /* White background */
+    color: #000;  /* Black text */
+    padding: 10px;  /* Padding for dropdown items */
+    font-size: 16px;  /* Same font size as select */
+    cursor: pointer;
+  }
+  
+  /* Focus Styles */
+  select:focus {
+    border-color: #000;  /* Keep black border */
+    background-color: #f0f0f0;  /* Slightly darker background on focus */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);  /* Shadow effect for focus */
+  }
+  
+  /* Hover Effect for Dropdown Items */
+  select option:hover {
+    background-color: #f0f0f0;  /* Highlight option on hover */
+    color: #333;  /* Slightly darker text */
+  }
+  
+  /* Enhanced visibility for open dropdown */
+  select:focus option {
+    display: block;  /* Ensure options are fully visible */
+    padding: 12px 15px;  /* Add padding for better visibility */
+  }
+  
+  /* Ensure visible when clicked */
+  select:focus-visible {
+    outline: none;  /* Remove default outline */
+    border-color: #000;  /* Keep visible with black border */
+  }
+  

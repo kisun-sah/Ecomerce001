@@ -21,28 +21,33 @@ function AdminProductTile({
             className="w-full h-[300px] object-cover rounded-t-lg"
           />
         </div>
-        <CardContent>
-          <h2 className="text-xl font-bold mb-2 mt-2">{title || "No Title"}</h2>
-          <div className="flex justify-between items-center mb-2">
-            <span
-              className={`${
-                salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
-            >
-              ₹{price || "N/A"}  {/* Fallback price */}
-            </span>
-            {salePrice > 0 && (
-              <span className="text-lg font-bold">₹{salePrice}</span>
-            )}
-          </div>
-        </CardContent>
+       <CardContent>
+  <h2 className="text-xl font-bold mb-2 mt-2">{title || "No Title"}</h2>
+  <p className="text-sm text-gray-600">
+
+  </p>
+  <div className="flex justify-between items-center mb-2">
+    <span
+      className={`${
+        salePrice > 0 ? "line-through" : ""
+      } text-lg font-semibold text-primary`}
+    >
+      ₹{price || "N/A"}  {/* Fallback price */}
+    </span>
+    {salePrice > 0 && (
+      <span className="text-lg font-bold">₹{salePrice}</span>
+    )}
+  </div>
+</CardContent>
+
         <CardFooter className="flex justify-between items-center">
           <Button
-              className="text-white bg-black"
+              className="text-white bg-rose-900"
             onClick={() => {
               setOpenCreateProductsDialog(true);
               setCurrentEditedId(_id);
               setFormData(product);
+          
             }}
             disabled={!_id}  // Disable if no product ID
           >
@@ -51,6 +56,7 @@ function AdminProductTile({
           <Button
           className="text-white bg-black"
             onClick={() => handleDelete(_id)}
+            
             disabled={!_id}  // Disable if no product ID
             variant="destructive"  // Apply red styling for Delete
           >

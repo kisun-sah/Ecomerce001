@@ -6,7 +6,8 @@ import { Badge } from "../ui/badge";
 
 function ShoppingProductTile({ product }) {
   return (
-    <Card className="w-full max-w-sm mx-auto">
+<Card className="w-full max-w-sm mx-auto shadow-sm hover:shadow-lg hover:scale-105 transform transition-all duration-300">
+
       <div>
         <div className="relative">
           <img
@@ -46,22 +47,26 @@ function ShoppingProductTile({ product }) {
                 product?.salePrice > 0 ? "line-through" : ""
               } text-lg font-semibold text-primary`}
             >
-              ${product?.price}
+              ₹{product?.price}
             </span>
             {product?.salePrice > 0 ? (
               <span className="text-lg font-semibold text-primary">
-                ${product?.salePrice}
+                ₹{product?.salePrice}
               </span>
             ) : null}
           </div>
         </CardContent>
       </div>
       <CardFooter>
-        <Button className="w-full opacity-60 cursor-not-allowed">
-          Out Of Stock
-        </Button>
-
-        <Button className="w-full">Add to cart</Button>
+        {product?.totalStock === 0 ? (
+          <Button className="w-full opacity-60 cursor-not-allowed">
+            Out Of Stock
+          </Button>
+        ) : (
+          <Button className="w-full text-white bg-black hover:bg-primary-light transition-colors duration-200">
+            Add to cart
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

@@ -73,7 +73,7 @@ const shoppingCartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.data;
       })
-      .addCase(addToCart.rejected, (state) => {
+      .addCase(addToCart.rejected, (state) => {     
         state.isLoading = false;
         state.cartItems = [];
       })

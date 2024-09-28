@@ -1,14 +1,15 @@
+/* eslint-disable react/prop-types */
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { StarIcon } from "lucide-react";
 
-function productDetailsDialog({ open, setOpen, productDetails }) {
+function ProductDetailsDialog({ open, setOpen, productDetails }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="grid grid-cols-2 gap-8 text-black bg-slate-50 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
-        <div className="relative overflow-hidden rounded-lg">
+      <DialogContent className="grid grid-cols-2 text-black bg-slate-100 gap-8 sm:p-12 max-w-[90vw] max-h-[90vh] sm:max-h-[95vh] sm:max-w-[90vw] lg:max-w-[80vw] overflow-y-auto">
+        <div className="relative overflow-hidden rounded-lg shadow-md">
           <img
             src={productDetails?.image}
             alt={productDetails?.title}
@@ -17,155 +18,92 @@ function productDetailsDialog({ open, setOpen, productDetails }) {
             className="aspect-square w-full object-cover"
           />
         </div>
-        <div>
-          <div className=" ">
-            <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1>
-            <p className="text-muted-foreground text-2xl mb-5 mt-4">
+
+        <div className="flex flex-col justify-between">
+          {/* Title and Description */}
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {productDetails?.title}
+            </h1>
+            <p className="text-lg text-gray-600 mt-4">
               {productDetails?.description}
             </p>
           </div>
 
-          <div className="flex items-center justify-between">
-            <p
-              className={`text-3xl font-bold text-primary ${
-                productDetails?.salePrice > 0 ? "line-through" : ""
-              }`}
-            >
+          {/* Price and Sale Price */}
+          <div className="flex items-center justify-between mt-6">
+            <p className={`text-3xl font-bold ${productDetails?.salePrice > 0 ? "line-through text-red-500" : "text-gray-900"}`}>
               ₹{productDetails?.price}
             </p>
-            {productDetails?.salePrice > 0 ? (
-              <p className="text-2xl font-bold text-muted-foreground">
+            {productDetails?.salePrice > 0 && (
+              <p className="text-2xl font-bold text-green-600">
                 ₹{productDetails?.salePrice}
               </p>
-            ) : null}
+            )}
           </div>
 
-          <div className="flex items-center gap-2 mt-2">
-               <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                
-                  <p className="text-muted-foreground">
-                    This is an ashome product .
-                  </p>
-                </div>
-            <span className="text-muted forground"> (4.5) </span>
+          {/* Rating */}
+          <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, index) => (
+                <StarIcon key={index} className="w-5 h-5 fill-yellow-400" />
+              ))}
+            </div>
+            <span className="text-gray-600">(4.5)</span>
           </div>
 
-          <div className="mt-5 mb-5">
+          {/* Stock and Button */}
+          <div className="mt-6">
             {productDetails?.totalStock === 0 ? (
-              <Button className="w-full opacity-60 cursor-not-allowed">
+              <Button className="w-full opacity-60 cursor-not-allowed bg-gray-800 text-white">
                 Out of Stock
               </Button>
             ) : (
-              <Button className="w-full text-white bg-black">
+              <Button className="w-full bg-black text-white hover:bg-gray-800 transition duration-200">
                 Add to Cart
               </Button>
             )}
           </div>
 
-          <div className="max-h-[300px] overflow-auto">
-            <h2 className="text-xl font-bold mb-4">Reviews</h2>
-            <div className="grid gap-6">
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border bg-black text-white">
-                  <AvatarFallback className="text-lg font-extrabold">
-                    k
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold"> Kisu sah</h3>
+          {/* Reviews Section */}
+          <div className="max-h-[300px] overflow-auto mt-8">
+            <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+            <div className="space-y-6">
+              {Array(3)
+                .fill(0)
+                .map((_, i) => (
+                  <div className="flex gap-4" key={i}>
+                    <Avatar className="h-10 w-10 border bg-gray-900 text-white">
+                      <AvatarFallback className="text-lg font-extrabold">
+                        K
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold">Kisu Sah</h3>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, index) => (
+                          <StarIcon key={index} className="w-5 h-5 fill-yellow-400" />
+                        ))}
+                      </div>
+                      <p className="text-gray-500">This is an awesome product.</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an ashome product .
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border bg-black text-white">
-                  <AvatarFallback className="text-lg font-extrabold">
-                    k
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold"> Kisu sah</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an ashome product .
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border bg-black text-white">
-                  <AvatarFallback className="text-lg font-extrabold">
-                    k
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold"> Kisu sah</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an ashome product .
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Avatar className="h-10 w-10 border bg-black text-white">
-                  <AvatarFallback className="text-lg font-extrabold">
-                    k
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold"> Kisu sah</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                    <StarIcon className="w-5 h-5  fill-black" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an ashome product .
-                  </p>
-                </div>
-              </div>
+                ))}
             </div>
-            <div className="mt-6 flex gap-2" >
-                <input placeholder="write a review ........" />
-                <Button>Submit</Button>
-            </div>
+          </div>
+
+          {/* Write a Review Section */}
+          <div className="mt-6 flex gap-2">
+            <input
+              type="text"
+              placeholder="Write a review..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 ease-in"
+            />
+            <Button className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-200 ease-in">
+              Submit
+            </Button>
           </div>
         </div>
 
@@ -175,4 +113,4 @@ function productDetailsDialog({ open, setOpen, productDetails }) {
   );
 }
 
-export default productDetailsDialog;
+export default ProductDetailsDialog;

@@ -2,7 +2,7 @@
 import * as React from "react";
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000; // Set long delay for demonstration purposes
+const TOAST_REMOVE_DELAY = 3000; // Set delay to 3 seconds
 
 // eslint-disable-next-line no-unused-vars
 const actionTypes = {

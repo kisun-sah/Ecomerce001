@@ -46,7 +46,7 @@ function UserCartWrapper({ cartItems }) {
         //   navigate("/shop/checkout");
         //   setOpenCartSheet(false);
         // }}
-        className="w-full mt-6"
+        className="w-full mt-6 text-white bg-black"
       >
         Checkout
       </Button>

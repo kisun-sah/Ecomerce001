@@ -2,6 +2,7 @@
 /* eslint-disable react/jsx-key */
 import ProductFilter from "@/components/shopping-view/filter";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,16 +10,18 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { ArrowUpDownIcon } from "lucide-react";
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 import { sortOptions } from "@/components/config";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/products-slice";
-import ShoppingProductTile from "@/components/shopping-view/product-tile";
-import { useSearchParams } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
-import { toast, useToast } from "@/hooks/use-toast";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+} from "@/store/shop/products-slice";
+import { ArrowUpDownIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -36,9 +39,11 @@ function createSearchParamsHelper(filterParams) {
   return queryParams.join("&");
 }
 
-function ShopingListing() {
+function ShoppingListing() {
   const dispatch = useDispatch();
-  const { productList, productDetails } = useSelector((state) => state.shopProducts);
+  const { productList, productDetails } = useSelector(
+    (state) => state.shopProducts
+  );
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
@@ -47,15 +52,13 @@ function ShopingListing() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { toast } = useToast();
 
-  function handleSort(value) {
-    console.log(value);
+  const categorySearchParam = searchParams.get("category");
 
+  function handleSort(value) {
     setSort(value);
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-    console.log(getSectionId, getCurrentOption);
-
     let cpyFilters = { ...filters };
     const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId);
 
@@ -79,12 +82,30 @@ function ShopingListing() {
 
   function handleGetProductDetails(getCurrentProductId) {
     console.log(getCurrentProductId);
-     dispatch(fetchProductDetails(getCurrentProductId));
+    dispatch(fetchProductDetails(getCurrentProductId));
   }
 
+  function handleAddtoCart(getCurrentProductId, getTotalStock) {
+    console.log(cartItems);
+    let getCartItems = cartItems.items || [];
 
+    if (getCartItems.length) {
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId === getCurrentProductId
+      );
+      if (indexOfCurrentItem > -1) {
+        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+        if (getQuantity + 1 > getTotalStock) {
+          toast({
+            title: `Only ${getQuantity} quantity can be added for this item`,
+            variant: "destructive",
+          });
 
-  function handleAddtoCart(getCurrentProductId) {
+          return;
+        }
+      }
+    }
+
     dispatch(
       addToCart({
         userId: user?.id,
@@ -99,16 +120,12 @@ function ShopingListing() {
         });
       }
     });
-
-    console.log(getCurrentProductId );
- 
-
-
   }
+
   useEffect(() => {
     setSort("price-lowtohigh");
     setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
-  }, []);
+  }, [categorySearchParam]);
 
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
@@ -116,15 +133,6 @@ function ShopingListing() {
       setSearchParams(new URLSearchParams(createQueryString));
     }
   }, [filters]);
-
-  //feach list of producs
-  useEffect(() => {
-    if (filters !== null && sort !== null)
-      dispatch(
-        fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
-      ); // Invoke fetchAllFilteredProducts as a function
-  }, [dispatch, sort, filters]);
-
 
   useEffect(() => {
     if (filters !== null && sort !== null)
@@ -137,20 +145,20 @@ function ShopingListing() {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
 
-
-  console.log(cartItems ,'cartItems ');
-  
+  console.log(productList, "productListproductListproductList");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
       <ProductFilter filters={filters} handleFilter={handleFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">{productList?.length}</span>
+            <span className="text-muted-foreground">
+              {productList?.length} Products
+            </span>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
@@ -160,22 +168,12 @@ function ShopingListing() {
                   <span>Sort by</span>
                 </Button>
               </DropdownMenuTrigger>
-
-              <DropdownMenuContent
-                align="end"
-                className="w-[200px] z-50" // Added z-index to ensure visibility
-                style={{ overflow: "visible" }} // Ensure no overflow restrictions
-              >
-                <DropdownMenuRadioGroup
-                  className="bg-white rounded-lg shadow-md p-2"
-                  value={sort}
-                  onValueChange={handleSort}
-                >
+              <DropdownMenuContent align="end" className="w-[200px] w-56 bg-white text-black font-bold">
+                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
                     <DropdownMenuRadioItem
                       value={sortItem.id}
                       key={sortItem.id}
-                      className="flex items-center p-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                     >
                       {sortItem.label}
                     </DropdownMenuRadioItem>
@@ -197,9 +195,13 @@ function ShopingListing() {
             : null}
         </div>
       </div>
-      <ProductDetailsDialog open={openDetailsDialog} setOpen={setOpenDetailsDialog} productDetails={productDetails}/>
+      <ProductDetailsDialog
+        open={openDetailsDialog}
+        setOpen={setOpenDetailsDialog}
+        productDetails={productDetails}
+      />
     </div>
   );
 }
 
-export default ShopingListing;
+export default ShoppingListing;

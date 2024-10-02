@@ -2,49 +2,26 @@ const Address = require("../../models/Address");
 
 const addAddress = async (req, res) => {
   try {
-    const { 
-      userId, 
-      fullName, 
-      phone, 
-      addressLine1, 
-      addressLine2, 
-      city, 
-      state, 
-      country = "India", // default to India if not provided
-      pincode, 
-      landmark, 
-      addressType, 
-      defaultAddress = false, // default to false if not provided
-      notes 
-    } = req.body;
+    const { userId,fullName,phone , address , pincode, city, state , country, notes } = req.body;
 
-    // Validation for required fields
-    if (!userId || !fullName || !phone || !addressLine1 || !city || !state || !pincode || !addressType) {
+    if (!userId ||!fullName || !phone || !address ||!pincode ||  !city || !state || !country ||  !notes) {
       return res.status(400).json({
         success: false,
-        message: "Invalid data provided! Some required fields are missing.",
+        message: "Invalid data provided!",
       });
-    }
-
-    // If this address is set as default, make sure to update other addresses for the user
-    if (defaultAddress) {
-      await Address.updateMany({ userId }, { defaultAddress: false });
     }
 
     const newlyCreatedAddress = new Address({
       userId,
       fullName,
       phone,
-      addressLine1,
-      addressLine2,
+      address,  
+      pincode,  
       city,
       state,
       country,
-      pincode,
-      landmark,
-      addressType,
-      defaultAddress,
-      notes
+      notes,
+     
     });
 
     await newlyCreatedAddress.save();
@@ -57,117 +34,107 @@ const addAddress = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Server Error. Please try again later.",
+      message: "Error",
     });
   }
 };
-const fetchAllAddress = async (req, res) => {
-    try {
-      const { userId } = req.params;
-      if (!userId) {
-        return res.status(400).json({
-          success: false,
-          message: "User ID is required!",
-        });
-      }
-  
-      const addressList = await Address.find({ userId });
-  
-      if (addressList.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "No addresses found for this user.",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        data: addressList,
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({
-        success: false,
-        message: "Server error while fetching addresses.",
-      });
-    }
-  };
-  
 
-  const editAddress = async (req, res) => {
-    try {
-      const { userId, addressId } = req.params;
-      const formData = req.body;
-  
-      if (!userId || !addressId) {
-        return res.status(400).json({
-          success: false,
-          message: "User ID and Address ID are required!",
-        });
-      }
-  
-      // Handle if this address is set as the default
-      if (formData.defaultAddress) {
-        await Address.updateMany({ userId }, { defaultAddress: false });
-      }
-  
-      const address = await Address.findOneAndUpdate(
-        { _id: addressId, userId },
-        formData,
-        { new: true }
-      );
-  
-      if (!address) {
-        return res.status(404).json({
-          success: false,
-          message: "Address not found.",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        data: address,
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({
+const fetchAllAddress = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
         success: false,
-        message: "Server error while updating the address.",
+        message: "User id is required!",
       });
     }
-  };
-  
-  const deleteAddress = async (req, res) => {
-    try {
-      const { userId, addressId } = req.params;
-      if (!userId || !addressId) {
-        return res.status(400).json({
-          success: false,
-          message: "User ID and Address ID are required!",
-        });
-      }
-  
-      const address = await Address.findOneAndDelete({ _id: addressId, userId });
-  
-      if (!address) {
-        return res.status(404).json({
-          success: false,
-          message: "Address not found.",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Address deleted successfully.",
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(500).json({
+
+    const addressList = await Address.find({ userId });
+
+    res.status(200).json({
+      success: true,
+      data: addressList,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Error",
+    });
+  }
+};
+
+const editAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+    const formData = req.body;
+
+    if (!userId || !addressId) {
+      return res.status(400).json({
         success: false,
-        message: "Server error while deleting the address.",
+        message: "User and address id is required!",
       });
     }
-  };
-  
+
+    const address = await Address.findOneAndUpdate(
+      {
+        _id: addressId,
+        userId,
+      },
+      formData,
+      { new: true }
+    );
+
+    if (!address) {
+      return res.status(404).json({
+        success: false,
+        message: "Address not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: address,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Error",
+    });
+  }
+};
+
+const deleteAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+    if (!userId || !addressId) {
+      return res.status(400).json({
+        success: false,
+        message: "User and address id is required!",
+      });
+    }
+
+    const address = await Address.findOneAndDelete({ _id: addressId, userId });
+
+    if (!address) {
+      return res.status(404).json({
+        success: false,
+        message: "Address not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Address deleted successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Error",
+    });
+  }
+};
 
 module.exports = { addAddress, editAddress, fetchAllAddress, deleteAddress };

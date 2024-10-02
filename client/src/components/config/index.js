@@ -188,11 +188,32 @@ export const sortOptions = [
 
 export const addressFormControls = [
   {
+    label: "FullName",
+    name: "fullName",
+    componentType: "input",
+    type: "text",
+    placeholder: "Enter your address",
+  },
+  {
+    label: "Phone",
+    name: "phone",
+    componentType: "input",
+    type: "number",
+    placeholder: "Enter your phone number",
+  },
+  {
     label: "Address",
     name: "address",
     componentType: "input",
     type: "text",
     placeholder: "Enter your address",
+  },
+  {
+    label: "Pincode",
+    name: "pincode",
+    componentType: "input",
+    type: "number",
+    placeholder: "Enter your pincode",
   },
   {
     label: "City",
@@ -202,18 +223,19 @@ export const addressFormControls = [
     placeholder: "Enter your city",
   },
   {
-    label: "Pincode",
-    name: "pincode",
+    label: "State",
+    name: "state",
     componentType: "input",
     type: "text",
-    placeholder: "Enter your pincode",
+    placeholder: "Enter your state",
   },
+
   {
-    label: "Phone",
-    name: "phone",
+    label: "country",
+    name: "country",
     componentType: "input",
     type: "text",
-    placeholder: "Enter your phone number",
+    placeholder: "Enter your country number",
   },
   {
     label: "Notes",

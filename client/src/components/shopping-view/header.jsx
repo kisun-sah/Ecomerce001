@@ -33,7 +33,7 @@ import UserCartWrapper from "./cart-wraper";
 function MenuItems() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [, setSearchParams] = useSearchParams();
+  const [ setSearchParams] = useSearchParams();
 
   function handleNavigate(menuItem) {
     sessionStorage.removeItem("filters");

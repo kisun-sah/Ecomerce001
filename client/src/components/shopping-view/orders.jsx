@@ -1,12 +1,44 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+/* eslint-disable react/jsx-key */
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { Dialog, DialogTrigger, DialogContent } from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Dialog } from "../ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 import ShoppingOrderDetailsView from "./order-details";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllOrdersByUserId,
+  getOrderDetails,
+  resetOrderDetails,
+} from "@/store/shop/order-slice";
+import { Badge } from "../ui/badge";
 
 function ShoppingOrders() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { orderList, orderDetails } = useSelector((state) => state.shopOrder);
+
+  function handleFetchOrderDetails(getId) {
+    dispatch(getOrderDetails(getId));
+  }
+
+  useEffect(() => {
+    dispatch(getAllOrdersByUserId(user?.id));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (orderDetails !== null) setOpenDetailsDialog(true);
+  }, [orderDetails]);
+
+  console.log(orderDetails, "orderDetails");
 
   return (
     <Card>
@@ -17,7 +49,6 @@ function ShoppingOrders() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order IMG</TableHead>
               <TableHead>Order ID</TableHead>
               <TableHead>Order Date</TableHead>
               <TableHead>Order Status</TableHead>
@@ -28,23 +59,47 @@ function ShoppingOrders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>IMG</TableCell>
-              <TableCell>23534253454</TableCell>
-              <TableCell>12/10/24</TableCell>
-              <TableCell>Pending</TableCell>
-              <TableCell>₹2435</TableCell>
-              <TableCell>
-                <Dialog open={openDetailsDialog} onOpenChange={setOpenDetailsDialog}>
-                  <DialogTrigger asChild>
-                    <Button className="text-white bg-black">View Details</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <ShoppingOrderDetailsView />
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-            </TableRow>
+            {orderList && orderList.length > 0
+              ? orderList.map((orderItem) => (
+                  <TableRow>
+                    <TableCell>{orderItem?._id}</TableCell>
+                    <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`py-1 px-3 ${
+                          orderItem?.orderStatus === "confirmed"
+                            ? "bg-green-500"
+                            : orderItem?.orderStatus === "rejected"
+                            ? "bg-red-600"
+                            : "bg-orange-400"
+                        }`}
+                      >
+                        {orderItem?.orderStatus}
+                      </Badge>
+                    </TableCell>
+                    <TableCell> ₹{orderItem?.totalAmount}</TableCell>
+                    <TableCell>
+                      <Dialog
+                        open={openDetailsDialog}
+                        onOpenChange={() => {
+                          setOpenDetailsDialog(false);
+                          dispatch(resetOrderDetails());
+                        }}
+                      >
+                        <Button
+                        className=" bg-black text-white"
+                          onClick={() =>
+                            handleFetchOrderDetails(orderItem?._id)
+                          }
+                        >
+                          View Details
+                        </Button>
+                        <ShoppingOrderDetailsView orderDetails={orderDetails} />
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : null}
           </TableBody>
         </Table>
       </CardContent>

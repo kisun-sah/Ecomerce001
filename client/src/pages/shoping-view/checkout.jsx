@@ -38,6 +38,8 @@ function ShoppingCheckout() {
       toast({
         title: "Your cart is empty. Please add items to proceed",
         variant: "destructive",
+        
+      
       });
 
       return;

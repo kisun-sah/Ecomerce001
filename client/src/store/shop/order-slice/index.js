@@ -59,6 +59,19 @@ export const getOrderDetails = createAsyncThunk(
   }
 );
 
+export const deleteOrderById = createAsyncThunk(
+  "/order/deleteOrderById",
+  async (orderId) => {
+    const response = await axios.delete(
+      `http://localhost:5000/api/shop/order/delete/${orderId}`
+    );
+    return response.data;
+  }
+);
+
+
+
+
 const shoppingOrderSlice = createSlice({
   name: "shoppingOrderSlice",
   initialState,
@@ -107,7 +120,20 @@ const shoppingOrderSlice = createSlice({
       .addCase(getOrderDetails.rejected, (state) => {
         state.isLoading = false;
         state.orderDetails = null;
-      });
+      })
+        // Add the delete order cases here
+        .addCase(deleteOrderById.pending, (state) => {
+          state.isLoading = true;
+        })
+        .addCase(deleteOrderById.fulfilled, (state, action) => {
+          state.isLoading = false;
+          // Remove the deleted order from the order list
+          state.orderList = state.orderList.filter(order => order._id !== action.meta.arg);
+        })
+        .addCase(deleteOrderById.rejected, (state) => {
+          state.isLoading = false;
+        });
+     
   },
 });
 

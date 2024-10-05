@@ -1,7 +1,8 @@
-import { Dialog} from "../ui/dialog";
+/* eslint-disable react/jsx-key */
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
+import { Dialog } from "../ui/dialog";
 import {
   Table,
   TableBody,
@@ -10,22 +11,63 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState } from "react";
 import AdminOrderDetailsView from "./order-details";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteOrder,
+  getAllOrdersForAdmin,
+  getOrderDetailsForAdmin,
+  resetOrderDetails,
+} from "@/store/admin/order-slice";
+import { Badge } from "../ui/badge";
+import { toast } from "../ui/use-toast";
 
 function AdminOrdersView() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const { orderList, orderDetails } = useSelector((state) => state.adminOrder);
+  const dispatch = useDispatch();
+
+  function handleFetchOrderDetails(getId) {
+    dispatch(getOrderDetailsForAdmin(getId));
+  }
+
+  // Function to handle order deletion
+  const handleDeleteOrder = (orderId) => {
+    dispatch(deleteOrder(orderId)).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Order deleted successfully!",
+        });
+        dispatch(getAllOrdersForAdmin()); // Refresh the order list after deletion
+      } else {
+        toast({
+          title: "Failed to delete order.",
+          variant: "destructive",
+        });
+      }
+    });
+  };
+
+
+  useEffect(() => {
+    dispatch(getAllOrdersForAdmin());
+  }, [dispatch]);
+
+  console.log(orderDetails, "orderList");
+
+  useEffect(() => {
+    if (orderDetails !== null) setOpenDetailsDialog(true);
+  }, [orderDetails]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>All product </CardTitle>
+        <CardTitle>All Orders</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order IMG</TableHead>
               <TableHead>Order ID</TableHead>
               <TableHead>Order Date</TableHead>
               <TableHead>Order Status</TableHead>
@@ -33,35 +75,67 @@ function AdminOrdersView() {
               <TableHead>
                 <span className="sr-only">Details</span>
               </TableHead>
+              <TableHead>Order Delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableCell>IMG </TableCell>
-            <TableCell>23534253454</TableCell>
-            <TableCell>12/10/24</TableCell>
-            <TableCell>pending</TableCell>
-            <TableCell>₹2435</TableCell>
-            <TableCell>
-              <Dialog
-                open={openDetailsDialog}
-                onOpenChange={setOpenDetailsDialog}
-              >
-                <Button
-                  className="bg-black text-white"
-                  onClick={() => setOpenDetailsDialog(true)}
-                >
-                  View Details
-                </Button>
-
-              
-                <AdminOrderDetailsView/>
-              </Dialog>
-            </TableCell>
+            {orderList && orderList.length > 0
+              ? orderList.map((orderItem) => (
+                  <TableRow>
+                    <TableCell>{orderItem?._id}</TableCell>
+                    <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`py-1 px-3 ${
+                          orderItem?.orderStatus === "confirmed"
+                            ? "bg-green-500"
+                            : orderItem?.orderStatus === "rejected"
+                            ? "bg-red-600"
+                            : "bg-orange-500"
+                        }`}
+                      >
+                        {orderItem?.orderStatus}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>${orderItem?.totalAmount}</TableCell>
+                    <TableCell>
+                      <Dialog
+                        open={openDetailsDialog}
+                        onOpenChange={() => {
+                          setOpenDetailsDialog(false);
+                          dispatch(resetOrderDetails());
+                        }}
+                      >
+                        <Button
+                        className="bg-black text-white"
+                          onClick={() =>
+                            handleFetchOrderDetails(orderItem?._id)
+                          }
+                        >
+                          View Details
+                        </Button>
+                        <AdminOrderDetailsView orderDetails={orderDetails} />
+                      </Dialog>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        className="bg-red-600 text-white"
+                        
+                          onClick={() => handleDeleteOrder(orderItem?._id)}
+                       
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : null}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
   );
+  
 }
 
 export default AdminOrdersView;

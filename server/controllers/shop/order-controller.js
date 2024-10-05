@@ -199,9 +199,47 @@ const getOrderDetails = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Fetch the order by its ID
+    const order = await Order.findById(orderId);
+
+    // Check if the order exists
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Optionally delete the associated cart if it exists
+    if (order.cartId) {
+      await Cart.findByIdAndDelete(order.cartId);
+    }
+
+    // Delete the order
+    await order.deleteOne(); // Use deleteOne for clarity
+
+    return res.status(200).json({
+      success: true,
+      message: "Order deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting the order.",
+    });
+  }
+};
+
+
 module.exports = {
   createOrder,
   capturePayment,
   getAllOrdersByUser,
   getOrderDetails,
+  deleteOrder
 };

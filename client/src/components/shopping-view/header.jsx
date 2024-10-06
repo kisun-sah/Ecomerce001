@@ -1,4 +1,4 @@
-
+/* eslint-disable no-unused-vars */
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
@@ -11,43 +11,47 @@ import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { shoppingViewHeaderMenuItems } from "@/components/config";
 import {
-
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-
 } from "../ui/dropdown-menu";
 
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
 import { fetchCartItems } from "@/store/shop/cart-slice";
-import { useEffect, useState,  } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import UserCartWrapper from "./cart-wraper";
-
-
+import"../../style/shopingHome.css"
 
 function MenuItems() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [ setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  function handleNavigate(menuItem) {
+  function handleNavigate(getCurrentMenuItem) {
     sessionStorage.removeItem("filters");
-
-    const currentFilter = !["home", "products", "search"].includes(menuItem.id)
-      ? { category: [menuItem.id] }
-      : null;
+    
+    // Set current filter if applicable
+    const currentFilter =
+      getCurrentMenuItem.id !== "home" &&
+      getCurrentMenuItem.id !== "products" &&
+      getCurrentMenuItem.id !== "search"
+        ? {
+            category: [getCurrentMenuItem.id],
+          }
+        : null;
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
+    // Check if the pathname includes "listing" and set search params if needed
     if (location.pathname.includes("listing") && currentFilter !== null) {
-      setSearchParams(new URLSearchParams(`?category=${menuItem.id}`));
+      setSearchParams(new URLSearchParams({ category: getCurrentMenuItem.id }));
     } else {
-      navigate(menuItem.path);
+      navigate(getCurrentMenuItem.path);
     }
   }
 
@@ -116,7 +120,10 @@ function HeaderRightContent() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" className="w-56 bg-white text-black font-">
+        <DropdownMenuContent
+          side="right"
+          className="w-56 bg-white text-black font-"
+        >
           <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate("/shop/account")}>
@@ -134,16 +141,14 @@ function HeaderRightContent() {
   );
 }
 
-
 function ShoppingHeader() {
-  const { isAuthenticated ,user} = useSelector((state) => state.auth);
-  console.log(user , 'user');
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  console.log(user, "user");
   console.log(isAuthenticated);
-  
-  
 
   return (
-    <header className=" top-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
+  <header className="fixed top-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
+
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         {/* Logo and home link */}
         <Link to="/shop/home" className="flex items-center gap-2">
@@ -154,12 +159,19 @@ function ShoppingHeader() {
         {/* Mobile menu */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="lg:hidden border-gray-300 hover:border-blue-400 hover:bg-gray-50">
+            <Button
+              variant="outline"
+              size="icon"
+              className="lg:hidden border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+            >
               <Menu className="h-6 w-6 text-gray-600 hover:text-blue-500" />
               <span className="sr-only">Toggle header menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs bg-white text-black shadow-lg">
+          <SheetContent
+            side="left"
+            className="w-full max-w-xs bg-white text-black shadow-lg"
+          >
             <MenuItems />
             <HeaderRightContent />
           </SheetContent>
@@ -176,7 +188,6 @@ function ShoppingHeader() {
         </div>
       </div>
     </header>
-  
   );
 }
 

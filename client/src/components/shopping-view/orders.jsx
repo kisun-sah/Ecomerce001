@@ -19,6 +19,7 @@ import {
   resetOrderDetails,
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
+import "../../style/adminOrder.css"
 
 function ShoppingOrders() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
@@ -66,12 +67,18 @@ function ShoppingOrders() {
                     <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                     <TableCell>
                       <Badge
-                        className={`py-1 px-3 ${
+                        className={`py-1 px-3 badge ${
                           orderItem?.orderStatus === "confirmed"
                             ? "bg-green-500"
                             : orderItem?.orderStatus === "rejected"
                             ? "bg-red-600"
-                            : "bg-orange-400"
+                             : orderItem?.orderStatus === "delivered"
+                            ? "bg-blue-600"
+                             : orderItem?.orderStatus === "inShipping"
+                            ? "bg-red-400"
+                             : orderItem?.orderStatus === "inProcess"
+                            ? "bg-blue-400"
+                            : "bg-orange-500"
                         }`}
                       >
                         {orderItem?.orderStatus}

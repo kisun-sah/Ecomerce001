@@ -30,7 +30,7 @@ function createSearchParamsHelper(filterParams) {
     if (Array.isArray(value) && value.length > 0) {
       const paramValue = value.join(",");
 
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+      queryParams.push(` ${key}=${encodeURIComponent(paramValue)} `);
     }
   }
 

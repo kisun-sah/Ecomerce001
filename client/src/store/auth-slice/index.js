@@ -1,63 +1,64 @@
+/* eslint-disable no-unused-vars */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Initial state
 const initialState = {
   isAuthenticated: false,
   isLoading: true,
   user: null,
 };
 
-// Register User
 export const registerUser = createAsyncThunk(
-  "auth/registerUser", // More meaningful action name
-  async (formData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formData,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data); // Properly reject with value
-    }
-  }
-);
+  "/auth/register",
 
-// Login User
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
-  async (formData, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data); // Properly reject with value
-    }
-  }
-);
-
-// Logout User
-export const logoutUser = createAsyncThunk(
-  "auth/logoutUser",
-  async () => {
+  async (formData) => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/logout",
-      {},
-      { withCredentials: true }
+      "http://localhost:5000/api/auth/register",
+      formData,
+      {
+        withCredentials: true,
+      }
     );
+
     return response.data;
   }
 );
 
-// Check Auth
+export const loginUser = createAsyncThunk(
+  "/auth/login",
+
+  async (formData) => {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/login",
+      formData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "/auth/logout",
+
+  async () => {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/logout",
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+);
+
 export const checkAuth = createAsyncThunk(
-  "auth/checkAuth",
+  "/auth/checkauth",
+
   async () => {
     const response = await axios.get(
       "http://localhost:5000/api/auth/check-auth",
@@ -69,55 +70,47 @@ export const checkAuth = createAsyncThunk(
         },
       }
     );
+
     return response.data;
   }
 );
 
-// Auth slice
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload;
-      state.isAuthenticated = !!action.payload;
-    },
+    setUser: (state, action) => {},
   },
   extraReducers: (builder) => {
     builder
-      // Register User
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.success ? action.payload.user : null;
-        state.isAuthenticated = action.payload.success;
+        state.user = null;
+        state.isAuthenticated = false;
       })
-      // eslint-disable-next-line no-unused-vars
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Login User
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log(action);
+
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
       })
-      // eslint-disable-next-line no-unused-vars
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Check Auth
       .addCase(checkAuth.pending, (state) => {
         state.isLoading = true;
       })
@@ -126,15 +119,12 @@ const authSlice = createSlice({
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
       })
-      // eslint-disable-next-line no-unused-vars
       .addCase(checkAuth.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
       })
-
-      // Logout User
-      .addCase(logoutUser.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;

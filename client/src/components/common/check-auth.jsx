@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types */
 import { Navigate, useLocation } from "react-router-dom";
 
-// eslint-disable-next-line react/prop-types
 function CheckAuth({ isAuthenticated, user, children }) {
   const location = useLocation();
 
@@ -10,7 +10,6 @@ function CheckAuth({ isAuthenticated, user, children }) {
     if (!isAuthenticated) {
       return <Navigate to="/auth/login" />;
     } else {
-      // eslint-disable-next-line react/prop-types
       if (user?.role === "admin") {
         return <Navigate to="/admin/dashboard" />;
       } else {
@@ -34,7 +33,6 @@ function CheckAuth({ isAuthenticated, user, children }) {
     (location.pathname.includes("/login") ||
       location.pathname.includes("/register"))
   ) {
-    // eslint-disable-next-line react/prop-types
     if (user?.role === "admin") {
       return <Navigate to="/admin/dashboard" />;
     } else {
@@ -44,7 +42,6 @@ function CheckAuth({ isAuthenticated, user, children }) {
 
   if (
     isAuthenticated &&
-    // eslint-disable-next-line react/prop-types
     user?.role !== "admin" &&
     location.pathname.includes("admin")
   ) {
@@ -53,7 +50,6 @@ function CheckAuth({ isAuthenticated, user, children }) {
 
   if (
     isAuthenticated &&
-    // eslint-disable-next-line react/prop-types
     user?.role === "admin" &&
     location.pathname.includes("shop")
   ) {

@@ -58,7 +58,7 @@ function ShoppingProductTile({
             }).format(product?.price)}
           </span>
           {product?.salePrice > 0 ? (
-            <span className="text-lg font-semibold text-green-600">
+            <span className="text-lg font-semibold text-green-900">
               {new Intl.NumberFormat("en-IN", {
                 style: "currency",
                 currency: "INR",

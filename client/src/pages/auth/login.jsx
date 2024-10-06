@@ -35,31 +35,29 @@ function AuthLogin() {
   }
 
   return (
-<div className="mx-auto w-full max-w-md space-y-6 shadow-lg p-6 border border-gray-300 rounded-lg">
-  <div className="text-center">
-    <h1 className="text-3xl font-bold tracking-tight text-gray-800">
-      Sign in to your account
-    </h1>
-    <p className="mt-2 text-gray-600">
-      Don't have an account?
-      <Link
-        className="font-medium ml-2 text-blue-600 hover:underline"
-        to="/auth/register"
-      >
-        Register
-      </Link>
-    </p>
-  </div>
-  <CommonForm
-    formControls={loginFormControls}
-    buttonText={"Sign In"}
-    formData={formData}
-    setFormData={setFormData}
-    onSubmit={onSubmit}
-    buttonClassName="bg-black text-white hover:bg-gray-900 py-2 px-4 rounded-md shadow-lg"
-  />
-</div>
-
+    <div className="mx-auto w-full max-w-md space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Sign in to your account
+        </h1>
+        <p className="mt-2">
+          Don't have an account
+          <Link
+            className="font-medium ml-2 text-primary hover:underline"
+            to="/auth/register"
+          >
+            Register
+          </Link>
+        </p>
+      </div>
+      <CommonForm
+        formControls={loginFormControls}
+        buttonText={"Sign In"}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={onSubmit}
+      />
+    </div>
   );
 }
 

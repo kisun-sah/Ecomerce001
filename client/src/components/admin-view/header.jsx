@@ -12,7 +12,7 @@ function AdminHeader({ setOpen }) {  // Receive setOpen as a prop from AdminLayo
   }
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-background border-b shadow-lg transition-shadow duration-300 hover:shadow-2xl">
+    <header className=" flex items-center justify-between px-4 py-3 bg-background border-b shadow-lg transition-shadow duration-300 hover:shadow-2xl">
     {/* Menu Toggle Button for small screens */}
     <Button
   className="lg:hidden sm:block text-gray-100 bg-gray-800 hover:text-gray-300 hover:bg-black hover:shadow-lg border border-gray-300 rounded-lg px-3 py-2 transition-all duration-300 ease-in-out transform hover:-translate-y-1"

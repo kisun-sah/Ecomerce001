@@ -19,13 +19,13 @@ const adminSidebarMenuItems = [
   {
     id: "products",
     label: "Products",
-    path: "/admin/product",
+    path: "/admin/products",
     icon: <ShoppingBasket />,
   },
   {
     id: "orders",
     label: "Orders",
-    path: "/admin/order",
+    path: "/admin/orders",
     icon: <BadgeCheck />,
   },
 ];
@@ -36,7 +36,7 @@ function MenuItems({ setOpen }) {
   const navigate = useNavigate();
 
   return (
-    <nav className="mt-8 flex-col flex gap-2">
+    <nav className=" mt-8 flex-col flex gap-2">
       {adminSidebarMenuItems.map((menuItem) => (
         <div
           key={menuItem.id}

@@ -25,7 +25,7 @@ import { fetchCartItems } from "@/store/shop/cart-slice";
 import { useEffect, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import UserCartWrapper from "./cart-wraper";
-import"../../style/shopingHome.css"
+import"../../style/header.css"
 
 function MenuItems() {
   const navigate = useNavigate();

@@ -1,11 +1,7 @@
 /* eslint-disable no-unused-vars */
+// Ensure these imports
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,37 +14,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { logoutUser } from "@/store/auth-slice";
+import { resetTokenAndCredentials } from "@/store/auth-slice"; // Ensure this is the correct action for logout
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { useEffect, useState } from "react";
-import { Label } from "@radix-ui/react-label";
 import UserCartWrapper from "./cart-wraper";
-import"../../style/header.css"
+import "../../style/header.css";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 function MenuItems() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   function handleNavigate(getCurrentMenuItem) {
     sessionStorage.removeItem("filters");
     
-    // Set current filter if applicable
     const currentFilter =
       getCurrentMenuItem.id !== "home" &&
       getCurrentMenuItem.id !== "products" &&
       getCurrentMenuItem.id !== "search"
-        ? {
-            category: [getCurrentMenuItem.id],
-          }
+        ? { category: [getCurrentMenuItem.id] }
         : null;
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
-    // Check if the pathname includes "listing" and set search params if needed
-    if (location.pathname.includes("listing") && currentFilter !== null) {
+    if (currentFilter !== null) {
       setSearchParams(new URLSearchParams({ category: getCurrentMenuItem.id }));
     } else {
       navigate(getCurrentMenuItem.path);
@@ -71,21 +61,23 @@ function MenuItems() {
 }
 
 function HeaderRightContent() {
-  const { user } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const [openCartSheet, setOpenCartSheet] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   function handleLogout() {
-    dispatch(logoutUser());
+    dispatch(resetTokenAndCredentials()); // Clear auth details in Redux
+    sessionStorage.clear(); // Clear session storage
+    navigate("/auth/login"); // Redirect to login page
   }
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.id));
-  }, [dispatch]);
-
-  console.log(cartItems, "kartik");
+    if (user?.id) {
+      dispatch(fetchCartItems(user?.id)); // Fetch cart items if user is logged in
+    }
+  }, [dispatch, user?.id]);
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
@@ -100,15 +92,10 @@ function HeaderRightContent() {
           <span className="absolute top-[-5px] right-[2px] font-bold text-sm">
             {cartItems?.items?.length || 0}
           </span>
-          <span className="sr-only">User cart</span>
         </Button>
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
-          cartItems={
-            cartItems && cartItems.items && cartItems.items.length > 0
-              ? cartItems.items
-              : []
-          }
+          cartItems={cartItems?.items?.length > 0 ? cartItems.items : []}
         />
       </Sheet>
 
@@ -116,13 +103,13 @@ function HeaderRightContent() {
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-black">
             <AvatarFallback className="bg-black text-white font-extrabold">
-              {user?.userName[0].toUpperCase()}
+              {user?.userName?.[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           side="right"
-          className="w-56 bg-white text-black font-"
+          className="w-56 bg-white text-black"
         >
           <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -142,21 +129,16 @@ function HeaderRightContent() {
 }
 
 function ShoppingHeader() {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-  console.log(user, "user");
-  console.log(isAuthenticated);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   return (
-  <header className="fixed top-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
-
+    <header className="fixed top-0 z-50 w-full bg-white shadow-md border-b border-gray-200">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo and home link */}
         <Link to="/shop/home" className="flex items-center gap-2">
           <HousePlug className="h-6 w-6 text-blue-500" />
           <span className="font-bold text-xl text-gray-800">Ecommerce</span>
         </Link>
 
-        {/* Mobile menu */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -165,7 +147,6 @@ function ShoppingHeader() {
               className="lg:hidden border-gray-300 hover:border-blue-400 hover:bg-gray-50"
             >
               <Menu className="h-6 w-6 text-gray-600 hover:text-blue-500" />
-              <span className="sr-only">Toggle header menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent
@@ -177,14 +158,12 @@ function ShoppingHeader() {
           </SheetContent>
         </Sheet>
 
-        {/* Desktop menu */}
         <div className="hidden lg:block">
           <MenuItems />
         </div>
 
-        {/* Right content */}
         <div className="hidden lg:block">
-          <HeaderRightContent />
+          {isAuthenticated && <HeaderRightContent />}
         </div>
       </div>
     </header>

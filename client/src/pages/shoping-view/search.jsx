@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-key */
+/* eslint-disable react/jsx-key */
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { Input } from "@/components/ui/input";
@@ -21,12 +22,10 @@ function SearchProducts() {
   const dispatch = useDispatch();
   const { searchResults } = useSelector((state) => state.shopSearch);
   const { productDetails } = useSelector((state) => state.shopProducts);
-
   const { user } = useSelector((state) => state.auth);
-
   const { cartItems } = useSelector((state) => state.shopCart);
   const { toast } = useToast();
-  
+
   // Debouncing effect for search input
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -86,20 +85,27 @@ function SearchProducts() {
 
   return (
     <div className="container mx-auto md:px-6 px-4 py-8">
+      {/* Search Bar Section */}
       <div className="flex justify-center mb-8">
-        <div className="w-full flex items-center">
+        <div className="w-full max-w-lg">
           <Input
             value={keyword}
             name="keyword"
             onChange={(event) => setKeyword(event.target.value)}
-            className="py-6"
+            className="py-4 px-6 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
             placeholder="Search Products..."
           />
         </div>
       </div>
-      {!searchResults.length ? (
-        <h1 className="text-5xl font-extrabold">No result found!</h1>
+      
+      {/* Display a suitable message when no keyword is entered */}
+      {keyword.trim() === "" ? (
+        <h2 className="text-center text-xl text-gray-500 mb-8">
+          Start typing to search for products
+        </h2>
       ) : null}
+
+      {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {searchResults.map((item) => (
           <ShoppingProductTile
@@ -109,6 +115,8 @@ function SearchProducts() {
           />
         ))}
       </div>
+      
+      {/* Product Details Dialog */}
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}

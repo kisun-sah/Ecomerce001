@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-// Ensure these imports
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
@@ -15,46 +14,45 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { resetTokenAndCredentials } from "@/store/auth-slice"; // Ensure this is the correct action for logout
+import { resetTokenAndCredentials } from "@/store/auth-slice"; 
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { useEffect, useState } from "react";
 import UserCartWrapper from "./cart-wraper";
-import "../../style/header.css";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import "../../style/header.css"; // For custom styling
 
 function MenuItems() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  function handleNavigate(getCurrentMenuItem) {
+  function handleNavigate(menuItem) {
     sessionStorage.removeItem("filters");
-    
+
     const currentFilter =
-      getCurrentMenuItem.id !== "home" &&
-      getCurrentMenuItem.id !== "products" &&
-      getCurrentMenuItem.id !== "search"
-        ? { category: [getCurrentMenuItem.id] }
+      menuItem.id !== "home" &&
+      menuItem.id !== "products" &&
+      menuItem.id !== "search"
+        ? { category: [menuItem.id] }
         : null;
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
     if (currentFilter !== null) {
-      setSearchParams(new URLSearchParams({ category: getCurrentMenuItem.id }));
+      setSearchParams(new URLSearchParams({ category: menuItem.id }));
     } else {
-      navigate(getCurrentMenuItem.path);
+      navigate(menuItem.path);
     }
   }
 
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Label
+        <span
           onClick={() => handleNavigate(menuItem)}
-          className="text-sm font-medium cursor-pointer"
+          className="text-sm font-medium cursor-pointer hover:text-blue-600 transition duration-200"
           key={menuItem.id}
         >
           {menuItem.label}
-        </Label>
+        </span>
       ))}
     </nav>
   );
@@ -68,14 +66,14 @@ function HeaderRightContent() {
   const dispatch = useDispatch();
 
   function handleLogout() {
-    dispatch(resetTokenAndCredentials()); // Clear auth details in Redux
-    sessionStorage.clear(); // Clear session storage
-    navigate("/auth/login"); // Redirect to login page
+    dispatch(resetTokenAndCredentials());
+    sessionStorage.clear();
+    navigate("/auth/login");
   }
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchCartItems(user?.id)); // Fetch cart items if user is logged in
+      dispatch(fetchCartItems(user?.id));
     }
   }, [dispatch, user?.id]);
 
@@ -89,7 +87,7 @@ function HeaderRightContent() {
           className="relative"
         >
           <ShoppingCart className="w-6 h-6" />
-          <span className="absolute top-[-5px] right-[2px] font-bold text-sm">
+          <span className="absolute top-[-5px] right-[2px] font-bold text-sm bg-red-500 rounded-full px-1 text-white">
             {cartItems?.items?.length || 0}
           </span>
         </Button>
@@ -101,7 +99,7 @@ function HeaderRightContent() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black">
+          <Avatar className="bg-black cursor-pointer">
             <AvatarFallback className="bg-black text-white font-extrabold">
               {user?.userName?.[0].toUpperCase()}
             </AvatarFallback>
@@ -109,7 +107,7 @@ function HeaderRightContent() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           side="right"
-          className="w-56 bg-white text-black"
+          className="w-56 bg-white text-black shadow-lg"
         >
           <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -166,6 +164,8 @@ function ShoppingHeader() {
           {isAuthenticated && <HeaderRightContent />}
         </div>
       </div>
+
+
     </header>
   );
 }
